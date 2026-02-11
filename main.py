@@ -47,5 +47,8 @@ def onmessage(client: Client, message: Message):
                 msg_attaches
                 # [attach['baseUrl'] for attach in msg_attaches if 'baseUrl' in attach]
             )
+import threading
+
 client.run()
 
+threading.Event().wait()

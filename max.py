@@ -224,7 +224,7 @@ class MaxClient:
                         # Пытаемся получить следующее сообщение с таймаутом 0.01 сек
                         next_msg = json.loads(self.websocket.recv(timeout=0.01))
                         self._process_message(next_msg)
-                    except (TimeoutError, websockets.exceptions.WebSocketTimeoutException):
+                    except TimeoutError:
                         # Больше нет сообщений в буфере
                         break
                     except ConnectionClosedError:
@@ -247,7 +247,7 @@ class MaxClient:
                     break
 
             except Exception as e:
-                print("Иная беда:", e)
+                print(e)
                 self._connected = False
                 time.sleep(5)
                 continue
