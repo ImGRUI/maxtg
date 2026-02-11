@@ -2,6 +2,7 @@ import subprocess
 import time
 import sys, os
 import datetime
+import html
 from telegram import send_to_telegram
 from dotenv import load_dotenv
 
@@ -33,7 +34,7 @@ def run_with_restart():
                 send_to_telegram(
                     TG_BOT_TOKEN,
                     MONITOR_ID,
-                    f"[{datetime.datetime.now()}] Скрипт упал (код: {exit_code})\nstderr:{stderr}"
+                    f"[{datetime.datetime.now()}] Скрипт упал (код: {exit_code})\nstderr:<pre>{html.escape(stderr)}</pre>"
         
             
                 )
