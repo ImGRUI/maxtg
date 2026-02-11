@@ -34,9 +34,7 @@ def run_with_restart():
                 send_to_telegram(
                     TG_BOT_TOKEN,
                     MONITOR_ID,
-                    f"[{datetime.datetime.now()}] Скрипт упал (код: {exit_code})\nstderr:<pre>{html.escape(stderr)}</pre>"
-        
-            
+                    f"[{datetime.datetime.now()}] Скрипт упал (код: {exit_code})\nstderr:<pre>{html.escape(str(stderr))}</pre>"       
                 )
                 restart_alarm = False
             print(f"[{datetime.datetime.now()}] Скрипт упал (код: {exit_code}). Перезапуск через 3 секунды...")

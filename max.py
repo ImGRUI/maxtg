@@ -2,6 +2,7 @@ from websockets.sync.client import connect
 from websockets.exceptions import ConnectionClosedError
 import json
 import threading
+import websockets
 import time
 from uuid import uuid4
 from classes import *
@@ -208,9 +209,27 @@ class MaxClient:
 
     # region _listener()
     def _listener(self):
+        """Listener with batch processing for multiple messages"""
         while not self._t_stop:
             try:
+                # Получаем первое сообщение
                 recv = json.loads(self.websocket.recv())
+                
+                # Обрабатываем первое сообщение
+                self._process_message(recv)
+                
+                # Проверяем, есть ли еще сообщения в буфере
+                while True:
+                    try:
+                        # Пытаемся получить следующее сообщение с таймаутом 0.01 сек
+                        next_msg = json.loads(self.websocket.recv(timeout=0.01))
+                        self._process_message(next_msg)
+                    except (TimeoutError, websockets.exceptions.WebSocketTimeoutException):
+                        # Больше нет сообщений в буфере
+                        break
+                    except ConnectionClosedError:
+                        break
+                        
             except ConnectionClosedError:
                 self._connected = False
                 try:
@@ -224,7 +243,6 @@ class MaxClient:
                 except Exception as ee:
                     print("Не смог встать:", ee)
                     time.sleep(5)
-
                 else:
                     break
 
@@ -234,11 +252,14 @@ class MaxClient:
                 time.sleep(5)
                 continue
 
-            opcode = recv.get("opcode")
-            payload = recv.get("payload")
+    def _process_message(self, recv):
+        """Process a single message"""
+        opcode = recv.get("opcode")
+        payload = recv.get("payload")
 
-            match opcode:
-                case 1:
+        match opcode:
+            case 1:
+                try:
                     self.websocket.send(json.dumps({
                         "ver": 11,
                         "cmd": 0,
@@ -246,16 +267,21 @@ class MaxClient:
                         "opcode": 1,
                         "payload": {"interactive": False}
                     }))
-                    self.websocket.recv()
-
-                case 128:
-                    msg = Message(self, payload["chatId"], **payload["message"])
-                    self._hlprocessor(msg)
-
-                case _:
+                except:
                     pass
 
-            print(json.dumps(recv, ensure_ascii=False, indent=4))
+            case 128:
+                try:
+                    msg = Message(self, payload["chatId"], **payload["message"])
+                    self._hlprocessor(msg)
+                except Exception as e:
+                    print("Ошибка обработки сообщения:", e)
+
+            case _:
+                pass
+
+        # Необязательно: можно закомментировать, если спамит в консоль
+        print(json.dumps(recv, ensure_ascii=False, indent=4))
 
 
     # region run()
@@ -274,6 +300,7 @@ class MaxClient:
         """
         self.connect()
         self._t = threading.Thread(target=self._listener, name="WebMaxListener")
+        self._t.daemon = True  # Добавляем daemon=True для автоматического завершения
         self._t.start()
         threading.Thread(target=self._heartbeat, name="WebMaxHeartbeat", daemon=True).start()
     
