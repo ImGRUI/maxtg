@@ -13,7 +13,7 @@ MAX_CHAT_IDS = [int(x) for x in os.getenv("MAX_CHAT_IDS").split(",")]
 TG_BOT_TOKEN = os.getenv("TG_BOT_TOKEN")
 TG_CHAT_ID = os.getenv("TG_CHAT_ID")
 if MAX_TOKEN == "" or MAX_CHAT_IDS == [] or TG_BOT_TOKEN == "" or TG_CHAT_ID == "":
-    print("Ошибка в .env, перепроверьтье")
+    print("Ошибка в .env, перепроверьте")
 MONITOR_ID = os.getenv("MONITOR_ID")
 client = Client(MAX_TOKEN)
 

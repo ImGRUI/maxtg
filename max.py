@@ -192,7 +192,7 @@ class MaxClient:
                 return  
 
     def _heartbeat(self):
-        """Отправляет пинг серверу каждые 25 секунд"""
+        """Отправляет пинг серверу каждые 30 секунд"""
         while self._connected and not self._t_stop:
             try:
                 self.websocket.send(json.dumps({
@@ -204,9 +204,7 @@ class MaxClient:
                 }))
             except Exception as e:
                 print("Heartbeat error:", e)
-                # для рестарта systemd сервиса
-                exit(1)
-            time.sleep(25)
+            time.sleep(30)
 
 
     # region _listener()
