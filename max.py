@@ -77,8 +77,8 @@ class MaxClient:
                     "deviceType": "WEB",
                     "locale": "en",
                     "osVersion": "Windows",
-                    "deviceName": "WebMax Lib",
-                    "headerUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+                    "deviceName": "Chrome",
+                    "headerUserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36",
                     "deviceLocale": "en",
                     "appVersion": "4.8.42",
                     "screen": "1920x1080 1.0x",
@@ -110,7 +110,7 @@ class MaxClient:
             ("Origin", "https://web.oneme.ru"),
             ("Pragma", "no-cache"),
             ("Cache-Control", "no-cache"),
-            ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36")
+            ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36")
         ]
         self.websocket = connect("wss://ws-api.oneme.ru/websocket", additional_headers=headers)
         self.websocket.send(self.user_agent)
@@ -204,6 +204,8 @@ class MaxClient:
                 }))
             except Exception as e:
                 print("Heartbeat error:", e)
+                # для рестарта systemd сервиса
+                exit(1)
             time.sleep(25)
 
 
@@ -267,6 +269,7 @@ class MaxClient:
                         "opcode": 1,
                         "payload": {"interactive": False}
                     }))
+                    self.websocket.recv()
                 except:
                     pass
 
