@@ -19,8 +19,13 @@ client = Client(MAX_TOKEN)
 
 @client.on_connect
 def onconnect():
+    if not hasattr(onconnect, 'counter'):
+        onconnect.counter = 0
+    onconnect.counter += 1
     if client.me != None:
         print(f"Имя: {client.me.contact.names[0].name}, Номер: {client.me.contact.phone} | ID: {client.me.contact.id}")
+    if onconnect.counter == 2:
+        os._exit(1011)
 
 
 @client.on_message(filters.any())
